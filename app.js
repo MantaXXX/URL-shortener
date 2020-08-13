@@ -21,10 +21,18 @@ app.set('view engine', 'handlebars')
 
 
 
-
 app.get('/', (req, res) => {
   res.render('index')
 })
+
+app.post('/shorten', (req, res) => {
+  res.render('index')
+})
+
+// app.get('/output', (req, res) => {
+//   res.render('succeed')
+// })
+
 
 app.listen(PORT, (req, res) => {
   console.log(`App is running on http://localhost:${PORT}`)
