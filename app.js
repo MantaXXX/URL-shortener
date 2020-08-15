@@ -64,11 +64,11 @@ app.get('/shorten', (req, res) => {
   }
 })
 
-app.get('https://cryptic-oasis-20664.herokuapp.com/:code', (req, res) => {
+app.get('/:code', (req, res) => {
   const code = req.params.code
   Url.find({ shortCode: code })
     .lean()
-    .then(url => res.render(longUrl))
+    .then(url => res.render(url.longUrl))
     .catch(error => console.log(error))
 })
 
