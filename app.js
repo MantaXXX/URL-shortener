@@ -25,40 +25,52 @@ app.get('/', (req, res) => {
 })
 
 app.get('/shorten', (req, res) => {
-  // get short code
-  let number = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-  let lowerLetter = 'abcdefghijklmnopqrstuvwxyz'
-  let upperLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  let lowerLetterArray = lowerLetter.split('')
-  let upperLetterArray = upperLetter.split('')
-  let totalArray = number.concat(lowerLetterArray, upperLetterArray)
-  let shortCode = ''
-  for (let i = 0; i < 5; i++) {
-    const index = Math.floor(Math.random() * totalArray.length)
-    shortCode += totalArray[index]
+  function generateShortCode() {
+    let number = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+    let lowerLetter = 'abcdefghijklmnopqrstuvwxyz'
+    let upperLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    let lowerLetterArray = lowerLetter.split('')
+    let upperLetterArray = upperLetter.split('')
+    let totalArray = number.concat(lowerLetterArray, upperLetterArray)
+    let code = ''
+    for (let i = 0; i < 5; i++) {
+      const index = Math.floor(Math.random() * totalArray.length)
+      code += totalArray[index]
+    }
+    return code
   }
-  // check if duplicate in database
-  Url.find({ shortCode: shortCode })
-    .lean()
-    .then(url => {
-      if (url.shortCode) {
-        console.log('exist!')
-      } else {
-        const longUrl = req.query.url
-        Url.create({
-          shortCode,
-          longUrl
-        })
-      }
-      res.render('finished', { shortCode })
-    })
-    .catch(error => console.log(error))
-  // let searchResult = Url.find({ shortCode: "1FdM6" }).lean()
-
-  // if not, create; if yes, recreate
-  // console.log(searchResult.schema.obj.shortCode.type)
-
+  getShortCode()
+  function getShortCode() {
+    // get short code
+    let code = generateShortCode()
+    Url.find()
+      .lean()
+      .then(url => {
+        // check if duplicate in database
+        if (url.shortCode === code) {
+          return getShortCode()
+        } else {
+          const longUrl = req.query.url
+          const shortCode = code
+          Url.create({
+            shortCode,
+            longUrl
+          })
+          res.render('finished', { shortCode })
+        }
+      })
+      .catch(error => console.log(error))
+  }
 })
+
+app.get('https://cryptic-oasis-20664.herokuapp.com/:code', (req, res) => {
+  const code = req.params.code
+  Url.find({ shortCode: code })
+    .lean()
+    .then(() => res.render(longUrl))
+    .catch(error => console.log(error))
+})
+
 
 app.listen(PORT, (req, res) => {
   console.log(`App is running on http://localhost:${PORT}`)
