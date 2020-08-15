@@ -2,9 +2,10 @@ const express = require('express')
 const exphbs = require('express-handlebars')
 const mongoose = require('mongoose')
 const Url = require('./model/url')
-const PORT = 3000
+const PORT = process.env.PORT || 3000
 
-mongoose.connect('mongodb://localhost/url-shortener', { useNewUrlParser: true, useUnifiedTopology: true })
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/url-shortener"
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 const db = mongoose.connection
 
 db.on('error', () => {
@@ -67,7 +68,7 @@ app.get('https://cryptic-oasis-20664.herokuapp.com/:code', (req, res) => {
   const code = req.params.code
   Url.find({ shortCode: code })
     .lean()
-    .then(() => res.render(longUrl))
+    .then(url => res.render(longUrl))
     .catch(error => console.log(error))
 })
 
