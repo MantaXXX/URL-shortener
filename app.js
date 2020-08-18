@@ -30,7 +30,6 @@ app.get('/', (req, res) => {
 app.get('/shorten', (req, res) => {
   let input = req.query.url
   let checkUrl = input.indexOf('https://')
-  console.log(checkUrl);
   if (checkUrl < 0) {
     return res.send('Please input valid URL')
   } else getShortCode()
@@ -66,10 +65,10 @@ app.get('/:code', (req, res) => {
 })
 
 // copy
-// app.post('/copy', (req, res) => {
-//   let copyListener = document.querySelector('.copy')
-//   copyListener.addEventListener('click', () => {
-//     // document.querySelector('.copy-content').select()
+// app.get('/copy', (req, res) => {
+//   let copy = document.querySelector('.copy')
+//   copy.addEventListener('click', () => {
+//     document.querySelector('.copy-content').select()
 //     document.execCommand('copy')
 //   })
 // })
