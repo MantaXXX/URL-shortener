@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
 })
 
 router.get('/:code', (req, res) => {
+  console.log(req.params)
   Url.findOne({ shortCode: req.params.code })
     .then((url) => {
       return res.redirect(url.longUrl)
