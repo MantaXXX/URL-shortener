@@ -6,8 +6,8 @@ const generateShortCode = require('../../generateShortCode')
 
 router.get('/', (req, res) => {
   let input = req.query.url
-  let checkUrl = input.indexOf('https://')
-  if (checkUrl < 0) {
+  let reg = /[http*s://]/
+  if (input.match(reg) === null) {
     return res.send('Please input valid URL')
   } else getShortCode()
   function getShortCode() {
