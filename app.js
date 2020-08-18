@@ -65,10 +65,10 @@ app.get('/shorten', (req, res) => {
 })
 
 app.get('/:code', (req, res) => {
-  const code = req.params.code
-  Url.find({ shortCode: code })
-    .lean()
-    .then(url => res.render(url.longUrl))
+  Url.findOne({ shortCode: req.params.code })
+    .then((url) => {
+      return res.redirect(url.longUrl)
+    })
     .catch(error => console.log(error))
 })
 
