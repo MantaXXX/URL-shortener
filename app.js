@@ -29,7 +29,8 @@ app.get('/', (req, res) => {
 
 app.get('/shorten', (req, res) => {
   let input = req.query.url
-  let checkUrl = input.indexOf('http://')
+  let checkUrl = input.indexOf('https://')
+  console.log(checkUrl);
   if (checkUrl < 0) {
     return res.send('Please input valid URL')
   } else getShortCode()
