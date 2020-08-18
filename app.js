@@ -2,6 +2,7 @@ const express = require('express')
 const exphbs = require('express-handlebars')
 const mongoose = require('mongoose')
 const Url = require('./model/url')
+const generateShortCode = require('./generateShortCode')
 const PORT = process.env.PORT || 3000
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/url-shortener"
@@ -21,26 +22,17 @@ const app = express()
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
 app.set('view engine', 'handlebars')
 
+
 app.get('/', (req, res) => {
   res.render('index')
 })
 
 app.get('/shorten', (req, res) => {
-  function generateShortCode() {
-    let number = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
-    let lowerLetter = 'abcdefghijklmnopqrstuvwxyz'
-    let upperLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    let lowerLetterArray = lowerLetter.split('')
-    let upperLetterArray = upperLetter.split('')
-    let totalArray = number.concat(lowerLetterArray, upperLetterArray)
-    let code = ''
-    for (let i = 0; i < 5; i++) {
-      const index = Math.floor(Math.random() * totalArray.length)
-      code += totalArray[index]
-    }
-    return code
-  }
-  getShortCode()
+  let input = req.query.url
+  let checkUrl = input.indexOf('http://')
+  if (checkUrl < 0) {
+    return res.send('Please input valid URL')
+  } else getShortCode()
   function getShortCode() {
     // get short code
     let code = generateShortCode()
@@ -48,10 +40,10 @@ app.get('/shorten', (req, res) => {
       .lean()
       .then(url => {
         // check if duplicate in database
-        if (url.shortCode === code) {
+        if (url.find(element => element.shortCode === code)) {
           return getShortCode()
         } else {
-          const longUrl = req.query.url
+          const longUrl = input
           const shortCode = code
           Url.create({
             shortCode,
@@ -72,6 +64,14 @@ app.get('/:code', (req, res) => {
     .catch(error => console.log(error))
 })
 
+// copy
+// app.post('/copy', (req, res) => {
+//   let copyListener = document.querySelector('.copy')
+//   copyListener.addEventListener('click', () => {
+//     // document.querySelector('.copy-content').select()
+//     document.execCommand('copy')
+//   })
+// })
 
 app.listen(PORT, (req, res) => {
   console.log(`App is running on http://localhost:${PORT}`)
